@@ -1,13 +1,11 @@
-#! /home/odoo/venvs/an_orm/bin/python
 import code
+import configparser
 
-import psycopg2
-from psycopg2.extras import RealDictCursor
+import psycopg
 
 from orm import Meta, utils
 import addons
 
-DATABASE_NAME = "an_orm_db"
 
 def setup(cr):
     for record_class in Meta.table_to_class_mapping.values():
@@ -29,6 +27,9 @@ def main(conn, cr):
     code.interact(local=locals())
 
 if __name__ == '__main__':
-    with psycopg2.connect(database=DATABASE_NAME) as conn:
-        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cr:
+    config = configparser.ConfigParser()
+    config.read(".config")
+    dbname = config['postgres']['dbname']
+    with psycopg.connect(dbname=dbname) as conn:
+        with conn.cursor(row_factory=psycopg.rows.dict_row) as cr:
             main(conn, cr)
