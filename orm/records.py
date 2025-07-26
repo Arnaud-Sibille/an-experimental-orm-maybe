@@ -1,4 +1,7 @@
+from psycopg import sql
+
 from .column import Column
+
 
 class Meta(type):
     table_to_class_mapping = {}
@@ -8,6 +11,7 @@ class Meta(type):
         if table := attrs.get('_table'):
             Meta.table_to_class_mapping[table] = cls
 
+
 class Records(metaclass=Meta):
     _table = None
 
@@ -15,13 +19,15 @@ class Records(metaclass=Meta):
         self._cr = cr
         self._ids = ids
 
-    def create(self, columns, values):
-        query = f"""
-            INSERT INTO {self._table} ({', '.join(columns)})
-            VALUES {values}
-            RETURNING id
-        """
-        self._cr.execute(query)
+    def create(self, col_value_dict):
+        columns = sql.SQL(', ').join(map(sql.Identifier, col_value_dict.keys()))
+        placeholders = sql.SQL(', ').join(map(sql.Placeholder, col_value_dict.keys()))
+        query = sql.SQL("INSERT INTO {} ({}) VALUES ({}) RETURNING id").format(
+            sql.Identifier(self._table),
+            columns,
+            placeholders,
+        )
+        self._cr.execute(query, col_value_dict)
         new_id = self._cr.fetchone()['id']
         return type(self)(self._cr, (new_id, ))
 

@@ -1,1 +1,2 @@
-from .partner import Partner
+from . import partner
+from . import dinosaur

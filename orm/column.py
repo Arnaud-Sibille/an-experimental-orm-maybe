@@ -1,3 +1,6 @@
+from psycopg import sql
+
+
 class Column:
     def __init__(self, attrs):
         self.attrs = attrs
@@ -8,6 +11,9 @@ class Column:
     def __get__(self, instance, owner):
         instance.ensure_one()
 
-        query = f"SELECT {self.name} FROM {instance._table} WHERE id = {instance._ids[0]}"
-        instance._cr.execute(query)
+        query = sql.SQL("SELECT {} FROM {} WHERE id = %s").format(
+            sql.Identifier(self.name),
+            sql.Identifier(instance._table),
+        )
+        instance._cr.execute(query, instance._ids)
         return instance._cr.fetchone()[self.name]

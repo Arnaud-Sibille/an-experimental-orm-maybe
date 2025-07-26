@@ -19,12 +19,23 @@ def main(conn, cr):
 
     # testing code
     partner = get_instance('partner')
-    partner = partner.create(('name', 'last_name'), ('Some', 'One'))
+    partner = partner.create({
+        'name': "Yohan",
+        'last_name': "Yoho",
+    })
     print(partner.name)
     print(partner.last_name)
+
+    dinosaur = get_instance('dinosaur')
+    dinosaur = dinosaur.create({
+        'name': "T-Rex",
+    })
+    print(dinosaur.name)
+
     conn.commit()
 
     code.interact(local=locals())
+
 
 if __name__ == '__main__':
     config = configparser.ConfigParser()
