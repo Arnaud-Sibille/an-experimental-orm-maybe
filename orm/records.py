@@ -33,7 +33,7 @@ class Records(metaclass=Meta):
 
     @classmethod
     def get_column_infos(cls):
-        return {key: value.attrs for key, value in cls.__dict__.items() if isinstance(value, Column)}
+        return {name: value.type for name, value in cls.__dict__.items() if isinstance(value, Column)}
 
     def ensure_one(self):
         if len(self._ids) != 1:

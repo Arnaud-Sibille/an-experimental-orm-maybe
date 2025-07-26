@@ -2,8 +2,8 @@ from psycopg import sql
 
 
 class Column:
-    def __init__(self, attrs):
-        self.attrs = attrs
+    def __init__(self, type):
+        self.type = type
 
     def __set_name__(self, owner, name):
         self.name = name
