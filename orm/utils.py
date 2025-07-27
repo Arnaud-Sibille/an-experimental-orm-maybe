@@ -11,19 +11,17 @@ def create_db_if_not_exists(dbname):
             if not cr.fetchone():
                 cr.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(dbname)))
 
-def create_table_if_not_exists(cr, record_class):
-    col_infos = {
-        "id": "SERIAL PRIMARY KEY",
-        **record_class.get_column_infos(),
-    }
-    cols_sql = sql.SQL(', ').join(
-       sql.SQL("{} {}").format(
-           sql.Identifier(name),
-           sql.SQL(type),
-       ) for name, type in col_infos.items()
-    )
-    query = sql.SQL("CREATE TABLE IF NOT EXISTS {} ({})").format(
-        sql.Identifier(record_class._table),
-        cols_sql,
+def create_table_if_not_exists(cr, table):
+    query = sql.SQL("CREATE TABLE IF NOT EXISTS {} (id SERIAL PRIMARY KEY)").format(
+        sql.Identifier(table),
     )
     cr.execute(query)
+
+def create_columns_if_not_exist(cr, record_class):
+    for col_name, col_type in record_class.get_column_infos().items():
+        query = sql.SQL("ALTER TABLE {} ADD COLUMN IF NOT EXISTS {} {}").format(
+            sql.Identifier(record_class._table),
+            sql.Identifier(col_name),
+            sql.SQL(col_type),
+        )
+        cr.execute(query)

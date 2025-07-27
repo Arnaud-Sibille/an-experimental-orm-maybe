@@ -1,3 +1,5 @@
+import inspect
+
 from psycopg import sql
 
 from .column import Column
@@ -33,7 +35,7 @@ class Records(metaclass=Meta):
 
     @classmethod
     def get_column_infos(cls):
-        return {name: value.type for name, value in cls.__dict__.items() if isinstance(value, Column)}
+        return {name: value.type for name, value in inspect.getmembers(cls) if isinstance(value, Column)}
 
     def ensure_one(self):
         if len(self._ids) != 1:
