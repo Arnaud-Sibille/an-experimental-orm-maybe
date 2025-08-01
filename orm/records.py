@@ -54,6 +54,13 @@ class Records(metaclass=Meta):
         )
         self._cr.execute(query, (*vals.values(), *self._ids))
 
+    def delete(self):
+        query = sql.SQL("DELETE FROM {} WHERE id IN ({})").format(
+            sql.Identifier(self._table),
+            sql.SQL(', ').join(sql.Placeholder() for _ in self._ids),
+        )
+        self._cr.execute(query, self._ids)
+
     @classmethod
     def get_column_infos(cls):
         return {name: value.type for name, value in inspect.getmembers(cls) if isinstance(value, Column)}
