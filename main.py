@@ -36,6 +36,7 @@ def execute_test_code(conn, cr):
     print(partner.favorite_color)
     partner.update({'age': 14})
     partner.update({'name': 'mmmh', 'last_name': 'chocolat'})
+    print(partner.read(['name', 'last_name', 'age', 'favorite_color']))
 
     dinosaur = get_instance('dinosaur')
     dinosaur = dinosaur.create({

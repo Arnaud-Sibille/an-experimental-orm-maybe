@@ -33,6 +33,15 @@ class Records(metaclass=Meta):
         new_id = self._cr.fetchone()['id']
         return type(self)(self._cr, (new_id, ))
 
+    def read(self, cols):
+        query = sql.SQL("SELECT {} FROM {} WHERE id IN ({})").format(
+            sql.SQL(', ').join(map(sql.Identifier, cols)),
+            sql.Identifier(self._table),
+            sql.SQL(', ').join(sql.Placeholder() for _ in self._ids),
+        )
+        self._cr.execute(query, self._ids)
+        return self._cr.fetchall()
+
     def update(self, vals):
         query = sql.SQL("UPDATE {} SET {} WHERE id IN ({})").format(
             sql.Identifier(self._table),
