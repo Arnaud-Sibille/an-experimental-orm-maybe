@@ -33,6 +33,18 @@ class Records(metaclass=Meta):
         new_id = self._cr.fetchone()['id']
         return type(self)(self._cr, (new_id, ))
 
+    def update(self, vals):
+        query = sql.SQL("UPDATE {} SET {} WHERE id IN ({})").format(
+            sql.Identifier(self._table),
+            sql.SQL(', ').join(sql.SQL('{} = {}').format(
+                    sql.Identifier(col),
+                    sql.Placeholder()
+                ) for col in vals.keys()
+            ),
+            sql.SQL(', ').join(sql.Placeholder() for _ in self._ids),
+        )
+        self._cr.execute(query, (*vals.values(), *self._ids))
+
     @classmethod
     def get_column_infos(cls):
         return {name: value.type for name, value in inspect.getmembers(cls) if isinstance(value, Column)}
