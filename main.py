@@ -31,12 +31,10 @@ def execute_test_code(conn, cr):
         'last_name': "Yoho",
         "favorite_color": "lightblue",
     })
-    print(partner.name)
-    print(partner.last_name)
-    print(partner.favorite_color)
-    partner.update({'age': 14})
+    print(partner.read(['name', 'last_name', 'display_name', 'age', 'favorite_color']))
+    partner.age = 14
     partner.update({'name': 'mmmh', 'last_name': 'chocolat'})
-    print(partner.read(['name', 'last_name', 'age', 'favorite_color']))
+    print(partner.read(['name', 'last_name', 'display_name', 'age', 'favorite_color']))
 
     dinosaur = get_instance('dinosaur')
     dinosaur = dinosaur.create({

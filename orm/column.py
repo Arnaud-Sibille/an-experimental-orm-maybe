@@ -1,19 +1,14 @@
-from psycopg import sql
-
-
 class Column:
     def __init__(self, type):
         self.type = type
 
-    def __set_name__(self, owner, name):
+    def __set_name__(self, _owner, name):
         self.name = name
 
-    def __get__(self, instance, owner):
+    def __get__(self, instance, _owner):
         instance.ensure_one()
 
-        query = sql.SQL("SELECT {} FROM {} WHERE id = %s").format(
-            sql.Identifier(self.name),
-            sql.Identifier(instance._table),
-        )
-        instance._cr.execute(query, instance._ids)
-        return instance._cr.fetchone()[self.name]
+        return instance.read([self.name])[0][self.name]
+
+    def __set__(self, instance, value):
+        instance.update({self.name: value})
